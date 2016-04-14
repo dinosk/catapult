@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<script>
+'use strict';
+
+tr.exportTo('tr.ui', function() {
+  function Powerlogger(path, number) {
+    if (path === undefined || number === undefined)
+      throw new Error('Missing arguments');
+    this.plot_ = path;
+  };
+
+  Powerlogger.prototype = {
+    get plot() {
+      return this.plot_;
+    },
+  }
+
+  return {
+    Powerlogger: Powerlogger
+  };
+});
+</script>
