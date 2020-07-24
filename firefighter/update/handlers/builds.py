@@ -24,8 +24,8 @@ class Builds(webapp2.RequestHandler):
 
     current_events = []
     events = []
-    for master_name in constants.MASTER_NAMES:
-      builders = buildbot.Builders(master_name)
+    for main_name in constants.MASTER_NAMES:
+      builders = buildbot.Builders(main_name)
       available_builds = _AvailableBuilds(builders)
       recorded_builds = _RecordedBuilds(bq, builders, available_builds)
       for builder in builders:
@@ -135,7 +135,7 @@ def _TraceEventsFromBuild(builder, build, query_time):
     build_end_time = build.end_time
   else:
     build_end_time = query_time
-  os, os_version, role = _ParseBuilderName(builder.master_name, builder.name)
+  os, os_version, role = _ParseBuilderName(builder.main_name, builder.name)
   yield {
       'name': 'Build %d' % build.number,
       'start_time': build.start_time,
@@ -145,8 +145,8 @@ def _TraceEventsFromBuild(builder, build, query_time):
       'builder': builder.name,
       'configuration': configuration,
       'host_shard': host_shard,
-      'hostname': build.slave_name,
-      'master': builder.master_name,
+      'hostname': build.subordinate_name,
+      'main': builder.main_name,
       'os': os,
       'os_version': os_version,
       'role': role,
@@ -176,8 +176,8 @@ def _TraceEventsFromBuild(builder, build, query_time):
         'builder': builder.name,
         'configuration': configuration,
         'host_shard': host_shard,
-        'hostname': build.slave_name,
-        'master': builder.master_name,
+        'hostname': build.subordinate_name,
+        'main': builder.main_name,
         'os': os,
         'os_version': os_version,
         'role': role,
@@ -186,8 +186,8 @@ def _TraceEventsFromBuild(builder, build, query_time):
     }
 
 
-def _ParseBuilderName(master_name, builder_name):
-  if master_name == 'chromium.perf':
+def _ParseBuilderName(main_name, builder_name):
+  if main_name == 'chromium.perf':
     match = re.match(r'^([A-Za-z]+)(?: ([0-9\.]+|XP))?([A-Za-z0-9-\. ]+)? '
                      r'(Builder|Perf)(?: \([0-9]+\))?$', builder_name).groups()
     os = match[0]
@@ -201,7 +201,7 @@ def _ParseBuilderName(master_name, builder_name):
       role = 'tester'
     else:
       raise NotImplementedError()
-  elif master_name == 'client.catapult':
+  elif main_name == 'client.catapult':
     match = re.match(r'^Catapult(?: ([A-Za-z])+)? ([A-Za-z]+)$',
                      builder_name).groups()
     os = match[1]
@@ -209,13 +209,13 @@ def _ParseBuilderName(master_name, builder_name):
     role = match[0]
     if not role:
       role = 'tester'
-  elif master_name == 'tryserver.chromium.perf':
+  elif main_name == 'tryserver.chromium.perf':
     match = re.match(r'^(android|linux|mac|win).*_([a-z]+)$',
                      builder_name).groups()
     os = match[0]
     os_version = None
     role = match[1]
-  elif master_name == 'tryserver.client.catapult':
+  elif main_name == 'tryserver.client.catapult':
     match = re.match(r'^Catapult(?: (Android|Linux|Mac|Windows))? ([A-Za-z]+)$',
                      builder_name).groups()
     os = match[0]

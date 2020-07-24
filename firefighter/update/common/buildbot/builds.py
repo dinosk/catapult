@@ -11,8 +11,8 @@ from common.buildbot import network
 
 class Builds(object):
 
-  def __init__(self, master_name, builder_name, url):
-    self._master_name = master_name
+  def __init__(self, main_name, builder_name, url):
+    self._main_name = main_name
     self._builder_name = builder_name
     self._url = url
 
@@ -62,7 +62,7 @@ class Builds(object):
         [('select', build_number) for build_number in build_numbers])
     url = 'json/builders/%s/builds/?%s' % (
         urllib.quote(self._builder_name), build_query)
-    url = network.BuildUrl(self._master_name, url)
+    url = network.BuildUrl(self._main_name, url)
     try:
       builds = network.FetchData(url).values()
     except ValueError:
@@ -71,12 +71,12 @@ class Builds(object):
       for build_number in build_numbers:
         url = 'json/builders/%s/builds/%d' % (
             urllib.quote(self._builder_name), build_number)
-        url = network.BuildUrl(self._master_name, url)
+        url = network.BuildUrl(self._main_name, url)
         try:
           builds.append(network.FetchData(url))
         except ValueError:
           logging.warning('Unable to fetch %s build %d',
-                          self._master_name, build_number)
+                          self._main_name, build_number)
           continue
 
     for build_data in builds:

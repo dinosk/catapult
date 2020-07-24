@@ -44,12 +44,12 @@ class GraphJsonTest(testing_common.TestCase):
       end_rev: Ending revision number.
       step: Difference between adjacent revisions.
     """
-    master = graph_data.Master(id='ChromiumGPU')
-    master.put()
+    main = graph_data.Main(id='ChromiumGPU')
+    main.put()
     bots = []
     rows = []
     for name in ['winXP', 'win7', 'mac']:
-      bot = graph_data.Bot(id=name, parent=master.key)
+      bot = graph_data.Bot(id=name, parent=main.key)
       bot.put()
       bots.append(bot)
       test = graph_data.Test(id='dromaeo', parent=bot.key)
@@ -80,9 +80,9 @@ class GraphJsonTest(testing_common.TestCase):
       end_rev: Ending revision number.
       step: Difference between adjacent revisions.
     """
-    master = graph_data.Master(id='master')
-    master.put()
-    bot = graph_data.Bot(id='bot', parent=master.key)
+    main = graph_data.Main(id='main')
+    main.put()
+    bot = graph_data.Bot(id='bot', parent=main.key)
     bot.put()
     test = graph_data.Test(id='suite', parent=bot.key)
     test.put()
@@ -175,7 +175,7 @@ class GraphJsonTest(testing_common.TestCase):
     self._AddLongTestColumns(start_rev=15700, end_rev=16000, step=1)
     graphs = {
         'test_path_dict': {
-            'master/bot/suite/sub1/sub2/sub3/sub4/sub5': ['sub5']
+            'main/bot/suite/sub1/sub2/sub3/sub4/sub5': ['sub5']
         },
         'is_selected': True
     }
@@ -189,7 +189,7 @@ class GraphJsonTest(testing_common.TestCase):
     self._AddLongTestColumns(start_rev=15700, end_rev=16000, step=1)
     graphs = {
         'test_path_dict': {
-            'master/bot/suite/sub1/sub2/sub3/sub4': ['sub4']
+            'main/bot/suite/sub1/sub2/sub3/sub4': ['sub4']
         }
     }
     # If the request is valid, a valid response will be returned.
@@ -202,7 +202,7 @@ class GraphJsonTest(testing_common.TestCase):
     self._AddLongTestColumns(start_rev=15700, end_rev=16000, step=1)
     graphs = {
         'test_path_dict': {
-            'master/bot/suite/sub1/sub2/sub3/sub4/sub5': ['sub5']
+            'main/bot/suite/sub1/sub2/sub3/sub4/sub5': ['sub5']
         },
     }
     # If the request is valid, a valid response will be returned.
@@ -280,7 +280,7 @@ class GraphJsonTest(testing_common.TestCase):
 
     rows = graph_data.Row.query(
         graph_data.Row.parent_test == ndb.Key(
-            'Master', 'ChromiumGPU', 'Bot', 'win7',
+            'Main', 'ChromiumGPU', 'Bot', 'win7',
             'Test', 'dromaeo', 'Test', 'dom')).fetch()
     for row in rows:
       row.error = 1 + ((row.revision - 15000) * 0.25)
@@ -616,7 +616,7 @@ class GraphJsonTest(testing_common.TestCase):
   def testGetGraphJson_UnSelectedTrace(self):
     self._AddTestColumns(start_rev=15000, end_rev=15050)
     test_key = ndb.Key(
-        'Master', 'ChromiumGPU', 'Bot', 'win7',
+        'Main', 'ChromiumGPU', 'Bot', 'win7',
         'Test', 'dromaeo', 'Test', 'jslib')
     rows = graph_data.Row.query(graph_data.Row.parent_test == test_key).fetch()
     for row in rows:
@@ -681,9 +681,9 @@ class GraphJsonParseRequestArgumentsTest(testing_common.TestCase):
     """Returns a GraphJsonHandler object with canned request parameters."""
     request_params = {
         'test_path_dict': {
-            'Master/b1/scrolling/frame_times/about.com': [],
-            'Master/b2/scrolling/frame_times/about.com': [],
-            'Master/linux/dromaeo.domcoremodify/dom': [],
+            'Main/b1/scrolling/frame_times/about.com': [],
+            'Main/b2/scrolling/frame_times/about.com': [],
+            'Main/linux/dromaeo.domcoremodify/dom': [],
         }
     }
     request_params.update(params)
@@ -699,9 +699,9 @@ class GraphJsonParseRequestArgumentsTest(testing_common.TestCase):
     handler = self._HandlerWithMockRequestParams(rev='12345', num_points='123')
     expected = {
         'test_path_dict': {
-            'Master/b1/scrolling/frame_times/about.com': [],
-            'Master/b2/scrolling/frame_times/about.com': [],
-            'Master/linux/dromaeo.domcoremodify/dom': [],
+            'Main/b1/scrolling/frame_times/about.com': [],
+            'Main/b2/scrolling/frame_times/about.com': [],
+            'Main/linux/dromaeo.domcoremodify/dom': [],
         },
         'rev': 12345,
         'num_points': 123,
@@ -716,9 +716,9 @@ class GraphJsonParseRequestArgumentsTest(testing_common.TestCase):
     handler = self._HandlerWithMockRequestParams()
     expected = {
         'test_path_dict': {
-            'Master/b1/scrolling/frame_times/about.com': [],
-            'Master/b2/scrolling/frame_times/about.com': [],
-            'Master/linux/dromaeo.domcoremodify/dom': [],
+            'Main/b1/scrolling/frame_times/about.com': [],
+            'Main/b2/scrolling/frame_times/about.com': [],
+            'Main/linux/dromaeo.domcoremodify/dom': [],
         },
         'rev': None,
         'num_points': graph_json._DEFAULT_NUM_POINTS,
@@ -733,9 +733,9 @@ class GraphJsonParseRequestArgumentsTest(testing_common.TestCase):
     handler = self._HandlerWithMockRequestParams(rev='-1')
     expected = {
         'test_path_dict': {
-            'Master/b1/scrolling/frame_times/about.com': [],
-            'Master/b2/scrolling/frame_times/about.com': [],
-            'Master/linux/dromaeo.domcoremodify/dom': [],
+            'Main/b1/scrolling/frame_times/about.com': [],
+            'Main/b2/scrolling/frame_times/about.com': [],
+            'Main/linux/dromaeo.domcoremodify/dom': [],
         },
         'rev': None,
         'num_points': graph_json._DEFAULT_NUM_POINTS,
@@ -749,8 +749,8 @@ class GraphJsonParseRequestArgumentsTest(testing_common.TestCase):
 class GraphJsonHelperFunctionTest(testing_common.TestCase):
 
   def testPointInfoDict_StdioUriMarkdown(self):
-    testing_common.AddTests(['Master'], ['b'], {'my_suite': {}})
-    test = utils.TestKey('Master/b/my_suite').get()
+    testing_common.AddTests(['Main'], ['b'], {'my_suite': {}})
+    test = utils.TestKey('Main/b/my_suite').get()
     test.buildername = 'MyBuilder'
     test_container_key = utils.GetTestContainerKey(test)
     row = graph_data.Row(id=345, buildnumber=456, parent=test_container_key)
@@ -761,8 +761,8 @@ class GraphJsonHelperFunctionTest(testing_common.TestCase):
     self.assertEqual(row.a_stdio_uri, point_info['a_stdio_uri'])
 
   def testPointInfoDict_RowHasNoTracingUri_ResultHasNoTracingUri(self):
-    testing_common.AddTests(['Master'], ['b'], {'my_suite': {}})
-    rows = testing_common.AddRows('Master/b/my_suite', [345])
+    testing_common.AddTests(['Main'], ['b'], {'my_suite': {}})
+    rows = testing_common.AddRows('Main/b/my_suite', [345])
     # This row has no a_tracing_uri property, so there should be no
     # trace annotation returned by _PointInfoDict.
     point_info = graph_json._PointInfoDict(rows[0], {})

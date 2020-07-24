@@ -11,8 +11,8 @@ from google.appengine.runtime import apiproxy_errors
 from base import constants
 
 
-def BuildUrl(master_name, url):
-  return '%s/%s/%s' % (constants.BUILDBOT_BASE_URL, master_name, url)
+def BuildUrl(main_name, url):
+  return '%s/%s/%s' % (constants.BUILDBOT_BASE_URL, main_name, url)
 
 
 def FetchData(url):
